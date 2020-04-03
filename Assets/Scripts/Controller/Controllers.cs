@@ -16,23 +16,26 @@ namespace GeekBrainsFPS
 
         public Controllers()
         {
-            ServiceLocator.SetService(new Inventory());
-
+            // Forming ServiceLocator data.
             IMotor motor = new UnitMotor(ServiceLocatorMonoBehaviour.GetService<CharacterController>());
             ServiceLocator.SetService(new PlayerController(motor));
+            ServiceLocator.SetService(new Inventory());
             ServiceLocator.SetService(new FlashLightController());
             ServiceLocator.SetService(new InputController());
             ServiceLocator.SetService(new WeaponController());
             ServiceLocator.SetService(new SelectionController());
             ServiceLocator.SetService(new TimeRemainingController());
+            ServiceLocator.SetService(new BotController());
+            ServiceLocator.SetService(new AimController());
 
-            _executeControllers = new IExecute[5];
-
+            // Forming IExecute controllers.
+            _executeControllers = new IExecute[6];
             _executeControllers[0] = ServiceLocator.Resolve<TimeRemainingController>();
             _executeControllers[1] = ServiceLocator.Resolve<PlayerController>();
             _executeControllers[2] = ServiceLocator.Resolve<FlashLightController>();
             _executeControllers[3] = ServiceLocator.Resolve<InputController>();
             _executeControllers[4] = ServiceLocator.Resolve<SelectionController>();
+            _executeControllers[5] = ServiceLocator.Resolve<BotController>();
         }
 
         #endregion
@@ -42,6 +45,7 @@ namespace GeekBrainsFPS
 
         public void Initialization()
         {
+            // Initialization stage.
             foreach (var controller in _executeControllers)
             {
                 if (controller is IInitialization initialization)
@@ -49,12 +53,15 @@ namespace GeekBrainsFPS
                     initialization.Initialization();
                 }
             }
+            ServiceLocator.Resolve<Inventory>().Initialization();
+            ServiceLocator.Resolve<AimController>().Initialization();
 
+            // Turning on stage.
             ServiceLocator.Resolve<PlayerController>().On();
             ServiceLocator.Resolve<InputController>().On();
             ServiceLocator.Resolve<SelectionController>().On();
-
-            ServiceLocator.Resolve<Inventory>().Initialization();
+            ServiceLocator.Resolve<BotController>().On();
+            ServiceLocator.Resolve<AimController>().On();
         }
 
         #endregion

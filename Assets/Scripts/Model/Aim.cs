@@ -14,7 +14,7 @@ namespace GeekBrainsFPS
 
         #region ICollision
 
-        public override void CollisionEnter(InfoCollision info)
+        public override void OnCollision(InfoCollision info)
         {
             if (_isDead) return;
             if (Hp > 0)

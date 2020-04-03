@@ -159,9 +159,12 @@ namespace GeekBrainsFPS
 
         private void AskColor(Transform obj, Color color)
         {
-            foreach (var curMaterial in obj.GetComponent<Renderer>().materials)
+            if (obj.TryGetComponent<Renderer>(out var renderer))
             {
-                curMaterial.color = color;
+                foreach (var curMaterial in renderer.materials)
+                {
+                    curMaterial.color = color;
+                }
             }
             if (obj.childCount <= 0) return;
             foreach (Transform d in obj)

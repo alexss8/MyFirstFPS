@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace GeekBrainsFPS
 {
-    public abstract class BaseAim : BaseObjectScene, ICollision, ISelectObj
+    public abstract class BaseAim : BaseObjectScene, ICollision, ISelectObj, IPointsGiver
     {
         #region PrivateData
 
-        public event Action<int> OnPointChange = delegate { };
+        public event Action<IPointsGiver> OnPointChange = delegate { };
 
         #endregion
 
@@ -25,9 +25,14 @@ namespace GeekBrainsFPS
 
         #region Methods
 
+        public int GivePoints()
+        {
+            return _points;
+        }
+
         public void HandleOnPointChange()
         {
-            OnPointChange.Invoke(_points);
+            OnPointChange.Invoke(this);
         }
 
         #endregion
@@ -35,7 +40,7 @@ namespace GeekBrainsFPS
 
         #region ICollision
 
-        public abstract void CollisionEnter(InfoCollision info);
+        public abstract void OnCollision(InfoCollision info);
 
         #endregion
 

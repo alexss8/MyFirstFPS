@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+
 namespace GeekBrainsFPS
 {
     public abstract class Ammunition : BaseObjectScene
@@ -20,7 +21,6 @@ namespace GeekBrainsFPS
         #endregion
 
 
-
         #region UnityMethods
 
         protected override void Awake()
@@ -36,6 +36,17 @@ namespace GeekBrainsFPS
 
             _damageLowerTimeRemaining = new TimeRemaining(LossOfDamage, 1.0f, true);
             _damageLowerTimeRemaining.AddTimeRemaining();
+        }
+
+        protected virtual void OnCollisionEnter(Collision collision)
+        {
+            var tempObj = collision.gameObject.GetComponent<ICollision>();
+
+            if (tempObj != null)
+            {
+                tempObj.OnCollision(new InfoCollision(_curDamage, collision.contacts[0], collision.transform,
+                    Rigidbody.velocity));
+            }
         }
 
         #endregion

@@ -12,6 +12,7 @@ namespace GeekBrainsFPS
         private KeyCode _reloadClip = KeyCode.R;
 
         private int _mouseButton = (int)MouseButton.LeftButton;
+        private float _mouseScrollDeltaY;
 
         #endregion
 
@@ -42,6 +43,27 @@ namespace GeekBrainsFPS
             }
         }
 
+        private void SelectWeaponByScroll(float mouseScrollDeltaY)
+        {
+            ServiceLocator.Resolve<WeaponController>().Off();
+
+            var inventory = ServiceLocator.Resolve<Inventory>();
+            Weapon tempWeapon = null;
+            if (mouseScrollDeltaY > 0.0f)
+            {
+                tempWeapon = inventory.GetNextWeapon();
+            }
+            else if (mouseScrollDeltaY < 0.0f)
+            {
+                tempWeapon = inventory.GetPreviousWeapon();
+            }
+
+            if (tempWeapon != null)
+            {
+                ServiceLocator.Resolve<WeaponController>().On(tempWeapon);
+            }
+        }
+
         #endregion
 
 
@@ -50,29 +72,15 @@ namespace GeekBrainsFPS
         public void Execute()
         {
             if (!IsActive) return;
+
             if (Input.GetKeyDown(_activeFlashLight))
             {
                 ServiceLocator.Resolve<FlashLightController>().Switch(ServiceLocator.Resolve<Inventory>().FlashLight);
             }
 
-            if (Input.mouseScrollDelta.y > 0)
-            {
-                ServiceLocator.Resolve<WeaponController>().Off();
-                var tempWeapon = ServiceLocator.Resolve<Inventory>().GetNextWeapon();
-                if (tempWeapon != null)
-                {
-                    ServiceLocator.Resolve<WeaponController>().On(tempWeapon);
-                }
-            }
-            if (Input.mouseScrollDelta.y < 0)
-            {
-                ServiceLocator.Resolve<WeaponController>().Off();
-                var tempWeapon = ServiceLocator.Resolve<Inventory>().GetPreviousWeapon();
-                if (tempWeapon != null)
-                {
-                    ServiceLocator.Resolve<WeaponController>().On(tempWeapon);
-                }
-            }
+            _mouseScrollDeltaY = Input.mouseScrollDelta.y;
+            if (Mathf.Abs(_mouseScrollDeltaY) > Mathf.Epsilon ) SelectWeaponByScroll(_mouseScrollDeltaY);
+
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 SelectWeapon(0);

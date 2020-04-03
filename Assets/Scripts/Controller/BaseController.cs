@@ -9,6 +9,7 @@
 
         #endregion
 
+
         #region Properties
 
         public bool IsActive { get; private set; }
