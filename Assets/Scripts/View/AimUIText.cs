@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
 
@@ -8,7 +9,8 @@ namespace GeekBrainsFPS
     {
         #region Fields
 
-        private BaseAim[] _aims;
+        private readonly HashSet<IPointsGiver> _pointsGivers = new HashSet<IPointsGiver>();
+
         private Text _text;
         private int _countPoint;
 
@@ -19,23 +21,28 @@ namespace GeekBrainsFPS
 
         private void Awake()
         {
-            _aims = FindObjectsOfType<BaseAim>();
             _text = GetComponent<Text>();
         }
 
         private void OnEnable()
         {
-            foreach (var aim in _aims)
+            if (_pointsGivers.Count != 0)
             {
-                aim.OnPointChange += UpdatePoint;
+                foreach (var pointsGiver in _pointsGivers)
+                {
+                    pointsGiver.OnPointChange += UpdatePoint;
+                }
             }
         }
 
         private void OnDisable()
         {
-            foreach (var aim in _aims)
+            if (_pointsGivers.Count != 0)
             {
-                aim.OnPointChange -= UpdatePoint;
+                foreach (var pointsGiver in _pointsGivers)
+                {
+                    pointsGiver.OnPointChange -= UpdatePoint;
+                }
             }
         }
 
@@ -44,16 +51,27 @@ namespace GeekBrainsFPS
 
         #region Methods
 
-        private void UpdatePoint(int points)
+        public void AddPointsGiver(IPointsGiver pointsGiver)
         {
+            if (_pointsGivers.Contains(pointsGiver)) return;
+
+            _pointsGivers.Add(pointsGiver);
+            pointsGiver.OnPointChange += UpdatePoint;
+        }
+
+        private void UpdatePoint(IPointsGiver pointsGiver)
+        {
+            if (!_pointsGivers.Contains(pointsGiver)) return;
+
             var pointTxt = "очков";
-            _countPoint += points;
+            _countPoint += pointsGiver.GivePoints();
             if (_countPoint >= 5) pointTxt = "очков";
             else if (_countPoint == 1) pointTxt = "очко";
             else if (_countPoint < 5) pointTxt = "очка";
             _text.text = $"Вы заработали {_countPoint} {pointTxt}";
 
-            //todo отписаться удалить и списка
+            pointsGiver.OnPointChange -= UpdatePoint;
+            _pointsGivers.Remove(pointsGiver);
         }
 
         #endregion

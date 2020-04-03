@@ -18,14 +18,9 @@ namespace GeekBrainsFPS
 
         #region UnityMethods
 
-        private void OnCollisionEnter(Collision collision)
+        protected override void OnCollisionEnter(Collision collision)
         {
-            var setDamage = collision.gameObject.GetComponent<ICollision>();
-
-            if (setDamage != null)
-            {
-                setDamage.CollisionEnter(new InfoCollision(_curDamage, Rigidbody.velocity));
-            }
+            base.OnCollisionEnter(collision);
 
             if (_countOfRicochets < _countOfRicochetsMax)
             {
