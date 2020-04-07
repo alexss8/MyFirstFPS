@@ -9,9 +9,13 @@ namespace GeekBrainsFPS
     {
         #region PrivateData
 
-        public event Action<Bot> OnDieChange;
-        public event Action<IPointsGiver> OnPointChange = delegate { };
+        public static event Action<Bot> OnBotEnabled = delegate { };
+        public static event Action<Bot> OnBotDisabled = delegate { };
 
+        public event Action<Bot> OnDieChange = delegate { };
+        public event Action<IPointsGiver> OnPointChange = delegate { };
+        public event Action<float> OnHealthChange = delegate { };
+        
         #endregion
 
 
@@ -23,9 +27,9 @@ namespace GeekBrainsFPS
         public NavMeshAgent Agent { get; private set; }
 
         [SerializeField] private int _points = 3;
+        [SerializeField] private float _maxHealth = 100.0f;
 
-        public float Hp = 100;
-
+        private Camera _camera;
         private StateBot _stateBot;
         private Vector3 _point;
         private ITimeRemaining _timeRemaining;
@@ -37,6 +41,9 @@ namespace GeekBrainsFPS
 
 
         #region Properties
+
+        public float CurrentHealthLevel => Mathf.Clamp(CurrentHealth / _maxHealth, 0.0f, 1.0f);
+        public float CurrentHealth { get; private set; }
 
         private StateBot StateBot
         {
@@ -76,17 +83,21 @@ namespace GeekBrainsFPS
         protected override void Awake()
         {
             base.Awake();
+            _camera = Camera.main;
             Agent = GetComponent<NavMeshAgent>();
             _timeRemaining = new TimeRemaining(ResetStateBot, _waitTime);
         }
 
         private void OnEnable()
         {
+            CurrentHealth = _maxHealth;
             var bodyBot = GetComponentInChildren<BodyBot>();
             if (bodyBot != null) bodyBot.OnApplyDamageChange += SetDamage;
 
             var headBot = GetComponentInChildren<HeadBot>();
             if (headBot != null) headBot.OnApplyDamageChange += SetDamage;
+
+            OnBotEnabled.Invoke(this);
         }
 
         private void OnDisable()
@@ -96,12 +107,26 @@ namespace GeekBrainsFPS
 
             var headBot = GetComponentInChildren<HeadBot>();
             if (headBot != null) headBot.OnApplyDamageChange -= SetDamage;
+
+            OnBotDisabled.Invoke(this);
         }
 
         #endregion
 
 
         #region Methods
+
+        public bool IsVisibleToCameraMain()
+        {
+            var planes = GeometryUtility.CalculateFrustumPlanes(_camera);
+            var point = gameObject.transform.position;
+            foreach (var plane in planes)
+            {
+                if (plane.GetDistanceToPoint(point) < 0)
+                    return false;
+            }
+            return true;
+        }
 
         public int GivePoints()
         {
@@ -115,13 +140,14 @@ namespace GeekBrainsFPS
 
         private void SetDamage(InfoCollision info)
         {
-            if (Hp > 0)
+            if (CurrentHealth > 0)
             {
                 GetAngry();
-                Hp -= info.Damage;
+                CurrentHealth -= info.Damage;
+                OnHealthChange?.Invoke(CurrentHealthLevel);
             }
 
-            if (Hp <= 0)
+            if (CurrentHealth <= 0)
             {
                 StateBot = StateBot.Died;
                 Agent.enabled = false;
