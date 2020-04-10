@@ -8,6 +8,7 @@ namespace GeekBrainsFPS
         #region Fields
 
         public Bot Bot;
+        public HealthUIBar HealthUIBar;
 
         #endregion
     }

@@ -25,17 +25,19 @@ namespace GeekBrainsFPS
             ServiceLocator.SetService(new WeaponController());
             ServiceLocator.SetService(new SelectionController());
             ServiceLocator.SetService(new TimeRemainingController());
+            ServiceLocator.SetService(new HealthBarController());
             ServiceLocator.SetService(new BotController());
             ServiceLocator.SetService(new AimController());
 
             // Forming IExecute controllers.
-            _executeControllers = new IExecute[6];
+            _executeControllers = new IExecute[7];
             _executeControllers[0] = ServiceLocator.Resolve<TimeRemainingController>();
             _executeControllers[1] = ServiceLocator.Resolve<PlayerController>();
             _executeControllers[2] = ServiceLocator.Resolve<FlashLightController>();
             _executeControllers[3] = ServiceLocator.Resolve<InputController>();
             _executeControllers[4] = ServiceLocator.Resolve<SelectionController>();
-            _executeControllers[5] = ServiceLocator.Resolve<BotController>();
+            _executeControllers[5] = ServiceLocator.Resolve<HealthBarController>();
+            _executeControllers[6] = ServiceLocator.Resolve<BotController>();
         }
 
         #endregion
@@ -46,13 +48,11 @@ namespace GeekBrainsFPS
         public void Initialization()
         {
             // Initialization stage.
-            foreach (var controller in _executeControllers)
-            {
-                if (controller is IInitialization initialization)
-                {
-                    initialization.Initialization();
-                }
-            }
+            ServiceLocator.Resolve<HealthBarController>().Initialization();
+            ServiceLocator.Resolve<HealthBarController>().On();
+            ServiceLocator.Resolve<BotController>().Initialization();
+
+            ServiceLocator.Resolve<FlashLightController>().Initialization();
             ServiceLocator.Resolve<Inventory>().Initialization();
             ServiceLocator.Resolve<AimController>().Initialization();
 
