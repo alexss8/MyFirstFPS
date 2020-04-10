@@ -10,6 +10,8 @@ namespace GeekBrainsFPS
         private KeyCode _activeFlashLight = KeyCode.F;
         private KeyCode _cancel = KeyCode.Escape;
         private KeyCode _reloadClip = KeyCode.R;
+        private KeyCode _savePlayer = KeyCode.F5;
+        private KeyCode _loadPlayer = KeyCode.F9;
 
         private int _mouseButton = (int)MouseButton.LeftButton;
         private float _mouseScrollDeltaY;
@@ -110,6 +112,16 @@ namespace GeekBrainsFPS
                 {
                     ServiceLocator.Resolve<WeaponController>().ReloadClip();
                 }
+            }
+
+            if (Input.GetKeyDown(_savePlayer))
+            {
+                ServiceLocator.Resolve<SaveDataRepository>().Save();
+            }
+
+            if (Input.GetKeyDown(_loadPlayer))
+            {
+                ServiceLocator.Resolve<SaveDataRepository>().Load();
             }
         }
 

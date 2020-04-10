@@ -121,6 +121,7 @@ GameObject:
   - component: {fileID: 649196415798114656}
   - component: {fileID: 649196415798114663}
   - component: {fileID: 649196415798114662}
+  - component: {fileID: 6075750115430820932}
   m_Layer: 0
   m_Name: Bot
   m_TagString: Untagged
@@ -260,6 +261,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6be0fc924ff9a44eb13d5842da1ea93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6075750115430820932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 649196415798114660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85fc211c49b74f14bb2ae2b576f5473e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ico: {fileID: 6397395132878484097, guid: 07b41a1852f11a4458bf63eef0055616, type: 3}
 --- !u!1 &649196415993050146
 GameObject:
   m_ObjectHideFlags: 0
@@ -492,8 +506,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Rigidbody: {fileID: 0}
   Transform: {fileID: 0}
-  Ammunition: {fileID: 9174693391879841462, guid: ca1df36b30204724cb8eb4f5b1163491,
-    type: 3}
   AmmunitionTypes: 04000000
   _barrel: {fileID: 649196416271397569}
   _force: 999
