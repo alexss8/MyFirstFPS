@@ -1,14 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace GeekBrainsFPS
 {
     public abstract class Weapon : BaseObjectScene
     {
+        #region PrivateDate
+
+        private static readonly Dictionary<AmmunitionType, string> _ammoTypeToPathHM = new Dictionary<AmmunitionType, string>
+        {
+            {AmmunitionType.None, "Projectiles/Bullet"},
+            {AmmunitionType.Bullet, "Projectiles/Bullet"},
+            {AmmunitionType.Rpg, "Projectiles/BulletRPG"},
+        };
+
+        #endregion
+
         #region Fields
 
-        public Ammunition Ammunition;
+        // Now we can use only one type of ammunition.
         public AmmunitionType[] AmmunitionTypes = { AmmunitionType.Bullet };
         public Clip Clip;
 
@@ -21,6 +34,7 @@ namespace GeekBrainsFPS
         [SerializeField] protected int _minCountAmmunition = 20;
         [SerializeField] protected int _countClip = 5;
 
+        protected Ammunition _ammunition;
         protected ITimeRemaining _timeRemaining;
 
         protected bool _isReady = true;
@@ -41,6 +55,13 @@ namespace GeekBrainsFPS
 
         private void Start()
         {
+            if (!_ammoTypeToPathHM.TryGetValue(AmmunitionTypes[0], out var ammoPath))
+            {
+                throw new NotImplementedException(
+                    $"{AmmunitionTypes[0]} not found in class '_ammoTypeToPathHM' hash map. Please, fill key with value.");
+            }
+            _ammunition = Resources.Load<Ammunition>(ammoPath);
+
             _timeRemaining = new TimeRemaining(ReadyShoot, _rechargeTime);
             for (var i = 0; i <= _countClip; i++)
             {
@@ -59,7 +80,7 @@ namespace GeekBrainsFPS
         {
             if (!_isReady) return;
             if (Clip.CountAmmunition <= 0) return;
-            var temAmmunition = Instantiate(Ammunition, _barrel.position, _barrel.rotation); //todo Pool object
+            var temAmmunition = Instantiate(_ammunition, _barrel.position, _barrel.rotation); //todo Pool object
             temAmmunition.AddForce(_barrel.forward * _force);
             Clip.CountAmmunition--;
             _isReady = false;

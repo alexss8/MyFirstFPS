@@ -28,6 +28,7 @@ namespace GeekBrainsFPS
             ServiceLocator.SetService(new HealthBarController());
             ServiceLocator.SetService(new BotController());
             ServiceLocator.SetService(new AimController());
+            ServiceLocator.SetService(new SaveDataRepository());
 
             // Forming IExecute controllers.
             _executeControllers = new IExecute[7];
